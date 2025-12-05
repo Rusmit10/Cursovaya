@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  user-service:
+    build: ./user-service
+    # No container_name to allow scaling
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    networks:
+      - app-network
+
+  reverse-proxy:
+    build: ./nginx
+    container_name: reverse-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - user-service
+      - frontend
+    networks:
+      - app-network
+
+  monitoring:
+    build: ./monitoring
+    container_name: monitoring
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

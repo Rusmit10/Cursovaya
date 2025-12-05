@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container" id="app">
+        <!-- Login/Register View -->
+        <div class="auth-view" id="authView">
+            <div class="glass-card auth-card">
+                <div class="logo">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="30" cy="30" r="28" stroke="url(#gradient)" stroke-width="4"/>
+                        <path d="M30 15C23.3726 15 18 20.3726 18 27C18 30.0902 19.2643 32.8889 21.3 34.95V40.5C21.3 41.3284 21.9716 42 22.8 42H37.2C38.0284 42 38.7 41.3284 38.7 40.5V34.95C40.7357 32.8889 42 30.0902 42 27C42 20.3726 36.6274 15 30 15Z" fill="url(#gradient)"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="60" y2="60">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="title">Identity Management</h1>
+                <p class="subtitle">Система управления пользователями</p>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <h2>Вход в систему</h2>
+                    <div class="form-group">
+                        <label for="loginUsername">Имя пользователя</label>
+                        <input type="text" id="loginUsername" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Пароль</label>
+                        <input type="password" id="loginPassword" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                    <p class="form-switch">
+                        Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a>
+                    </p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form hidden">
+                    <h2>Регистрация</h2>
+                    <div class="form-group">
+                        <label for="registerUsername">Имя пользователя</label>
+                        <input type="text" id="registerUsername" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Пароль</label>
+                        <input type="password" id="registerPassword" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    <p class="form-switch">
+                        Уже есть аккаунт? <a href="#" id="showLogin">Войти</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div class="dashboard-view hidden" id="dashboardView">
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <div class="logo-small">
+                        <svg width="40" height="40" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="30" cy="30" r="28" stroke="url(#gradient2)" stroke-width="4"/>
+                            <path d="M30 15C23.3726 15 18 20.3726 18 27C18 30.0902 19.2643 32.8889 21.3 34.95V40.5C21.3 41.3284 21.9716 42 22.8 42H37.2C38.0284 42 38.7 41.3284 38.7 40.5V34.95C40.7357 32.8889 42 30.0902 42 27C42 20.3726 36.6274 15 30 15Z" fill="url(#gradient2)"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="60" y2="60">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h1>Панель управления</h1>
+                    <div class="user-info">
+                        <span class="username" id="currentUsername">User</span>
+                        <button class="btn btn-secondary btn-small" id="logoutBtn">Выйти</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="dashboard-main">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2>Пользователи системы</h2>
+                        <button class="btn btn-primary btn-small" id="refreshBtn">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C9.84 2 11.48 2.84 12.56 4.16M12.56 4.16V1M12.56 4.16H9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Обновить
+                        </button>
+                    </div>
+                    
+                    <div class="users-grid" id="usersGrid">
+                        <div class="loading">Загрузка пользователей...</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="toast hidden" id="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
