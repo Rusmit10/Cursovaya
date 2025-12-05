@@ -1,0 +1,76 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:  # ← Добавить запуск на PR тоже!
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # ← Добавить таймаут
+
+    steps:
+    - uses: actions/checkout@v4  # ← Обновить до v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3  # ← Обновить до v3
+      
+    - name: Cache Docker layers  # ← Ускорит сборку
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+    
+    - name: Build Services
+      run: docker-compose build
+      
+    - name: Start Services
+      run: docker-compose up -d
+      
+    - name: Wait for Services to be healthy
+      run: |
+        # Ждём, пока сервисы станут доступны
+        for i in {1..30}; do
+          if curl -s -f http://localhost:3000/health > /dev/null; then
+            echo "Services are up!"
+            break
+          fi
+          echo "Waiting for services... ($i/30)"
+          sleep 5
+        done
+        
+        # Проверяем, что все контейнеры запущены
+        docker-compose ps
+        
+    - name: Run Tests
+      run: |
+        chmod +x tests/test_api.sh
+        # Если тесты падают - CI должен показывать ошибку
+        if ! ./tests/test_api.sh; then
+          echo "❌ Tests failed!"
+          exit 1
+        fi
+      
+    - name: Collect test results  # ← Для отчёта
+      if: always()
+      run: |
+        # Сохраняем логи тестов
+        docker-compose logs > test-logs.txt
+        echo "Test execution completed at $(date)" > test-summary.md
+        
+    - name: Upload test artifacts  # ← Для отчёта
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          test-logs.txt
+          test-summary.md
+          
+    - name: Stop Services
+      if: always()
+      run: docker-compose down
