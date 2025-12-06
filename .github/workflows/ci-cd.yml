@@ -251,46 +251,42 @@ jobs:
             echo ""
             echo "CI/CD Pipeline: ✅ УСПЕХ (Инфраструктура валидирована)"
             
-            # Создаем отчет о развертывании
+            # Создаем отчет о развертывании (упрощенная версия без HEREDOC)
             echo "Создание отчета о развертывании..."
-            cat > deployment-report.md << 'EOF'
-# ОТЧЕТ О РАЗВЕРТЫВАНИИ
-
-## Статус: ✅ УСПЕШНО
-
-### Развернутые сервисы:
-EOF
+            echo "# ОТЧЕТ О РАЗВЕРТЫВАНИИ" > deployment-report.md
+            echo "" >> deployment-report.md
+            echo "## Статус: ✅ УСПЕШНО" >> deployment-report.md
+            echo "" >> deployment-report.md
+            echo "### Развернутые сервисы:" >> deployment-report.md
             
             docker-compose ps --services | while read SERVICE; do
               STATUS=$(docker-compose ps -q $SERVICE | xargs docker inspect -f '{{.State.Status}}' 2>/dev/null || echo "unknown")
               echo "- **$SERVICE**: $STATUS" >> deployment-report.md
             done
             
-            cat >> deployment-report.md << 'EOF'
-
-### Проверка здоровья:
-- ✅ Auth Service: Доступен и отвечает
-- ✅ User Service: Работает (отвечает на запросы)
-- ✅ Database: Запущена и здорова
-- ✅ Frontend: Запущен
-- ✅ Monitoring: Запущен
-- ✅ Reverse Proxy: Запущен
-
-### Детали:
-- Всего контейнеров: 8
-- Все сервисы запущены
-- Сеть настроена корректно
-- Проблема обнаружена только в тестовых данных
-
-### Следующие шаги:
-1. Исправить тестовый скрипт tests/test_api.sh
-2. Обновить тестовые данные
-3. Добавить обработку ошибок 422 в тестах
-4. Стандартизировать health-эндпоинты
-
----
-*Отчет сгенерирован автоматически CI/CD pipeline*
-EOF
+            echo "" >> deployment-report.md
+            echo "### Проверка здоровья:" >> deployment-report.md
+            echo "- ✅ Auth Service: Доступен и отвечает" >> deployment-report.md
+            echo "- ✅ User Service: Работает (отвечает на запросы)" >> deployment-report.md
+            echo "- ✅ Database: Запущена и здорова" >> deployment-report.md
+            echo "- ✅ Frontend: Запущен" >> deployment-report.md
+            echo "- ✅ Monitoring: Запущен" >> deployment-report.md
+            echo "- ✅ Reverse Proxy: Запущен" >> deployment-report.md
+            echo "" >> deployment-report.md
+            echo "### Детали:" >> deployment-report.md
+            echo "- Всего контейнеров: 8" >> deployment-report.md
+            echo "- Все сервисы запущены" >> deployment-report.md
+            echo "- Сеть настроена корректно" >> deployment-report.md
+            echo "- Проблема обнаружена только в тестовых данных" >> deployment-report.md
+            echo "" >> deployment-report.md
+            echo "### Следующие шаги:" >> deployment-report.md
+            echo "1. Исправить тестовый скрипт tests/test_api.sh" >> deployment-report.md
+            echo "2. Обновить тестовые данные" >> deployment-report.md
+            echo "3. Добавить обработку ошибок 422 в тестах" >> deployment-report.md
+            echo "4. Стандартизировать health-эндпоинты" >> deployment-report.md
+            echo "" >> deployment-report.md
+            echo "---" >> deployment-report.md
+            echo "*Отчет сгенерирован автоматически CI/CD pipeline*" >> deployment-report.md
             
             echo "Отчет создан: deployment-report.md"
             exit 0
@@ -368,6 +364,5 @@ EOF
       uses: actions/upload-artifact@v4
       with:
         name: deployment-artifacts
-        path: |
-          deployment-report.md
+        path: deployment-report.md
         retention-days: 7
