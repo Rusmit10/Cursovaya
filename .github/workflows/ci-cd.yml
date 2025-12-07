@@ -104,4 +104,4 @@ jobs:
       with:
         name: ci-cd-success-report
         path: success-report.md
-        retention-days: 7
+        retention-days: 7 
